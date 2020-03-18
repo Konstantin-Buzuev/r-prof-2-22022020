@@ -12,8 +12,9 @@ class Router extends React.Component {
       Routes.push(
         <Route
           exact
+          key={key}
           path={"/chat/" + key}
-          render={() => <Layout user={this.props.user} chatID={key} />}
+          render={() => <Layout user={this.props.user} chatID={Number(key)} />}
         />
       );
     });
@@ -21,8 +22,9 @@ class Router extends React.Component {
       <Switch>
         <Route
           exact
+          key="0"
           path="/"
-          render={() => <Layout user={this.props.user} chatID={Number("1")} />}
+          render={() => <Layout user={this.props.user} chatID="" />}
         />
         {Routes}
       </Switch>

@@ -44,16 +44,16 @@ class Message extends Component {
     super(props);
   }
   render() {
-    this.sender = this.props.sender ? this.props.sender : "Bot";
-    this.text = this.props.text ? this.props.text : "Sorry, I'm busy ...";
+    let sender = this.props.sender;
+    let text = this.props.text;
     const { classes } = this.props;
-    const root = this.sender === "Bot" ? classes.rootL : classes.rootR;
-    const bgcolor = this.sender === "Bot" ? classes.paperL : classes.paperR;
+    const root = sender === "Bot" ? classes.rootL : classes.rootR;
+    const bgcolor = sender === "Bot" ? classes.paperL : classes.paperR;
     return (
       <div className={root}>
         <Paper className={bgcolor}>
-          <strong>{this.sender}</strong>
-          <p>{this.text}</p>
+          <strong>{sender}</strong>
+          <p>{text}</p>
         </Paper>
       </div>
     );

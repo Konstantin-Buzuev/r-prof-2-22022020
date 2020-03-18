@@ -1,0 +1,17 @@
+{
+    "1": {
+        "name": "Room 1",
+        "description": "First room",
+        "type": "normal"
+    },
+    "2": {
+        "name": "Room 2",
+        "description": "Second room",
+        "type": "important"
+    },
+    "3": {
+        "name": "Room 3",
+        "description": "Third room",
+        "type": "VIP"
+    }
+}

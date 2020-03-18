@@ -1,10 +1,33 @@
-import initialReducers from './reducers'
+import initialReducers from './reducers';
+import {
+    compose,
+    applyMiddleware
+} from 'redux'
 import {
     createStore
-} from 'redux'
+} from 'redux';
+import {
+    createBrowserHistory
+} from 'history';
+import {
+    routerMiddleware
+} from 'connected-react-router';
+import middlewares from '../middlewares/index.js'
 
 
-export default function initStore() {
-    let initialStore = {}
-    return createStore(initialReducers, initialStore)
+export const history = createBrowserHistory()
+
+
+
+function initStore() {
+    const initialStore = {};
+    const store = createStore(
+        initialReducers(history),
+        initialStore,
+        compose(applyMiddleware(routerMiddleware(history), ...middlewares),
+            window.__REDUX_DEVTOOLS_EXTENSION__ ? window.__REDUX_DEVTOOLS_EXTENSION__() : () => {}))
+    return store;
+
 }
+
+export default initStore

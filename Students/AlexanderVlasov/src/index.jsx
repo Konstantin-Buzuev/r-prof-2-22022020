@@ -12,6 +12,12 @@ import Header from './components/Header/Header.jsx';
 import Router from './router/Router.jsx';
 import { HashRouter } from 'react-router-dom';
 
+import { ConnectedRouter } from 'connected-react-router';
+import { history } from './store/store.js';
+import { PersistGate } from "redux-persist/integration/react";
+
+const { store, persistor } = initStore();
+
 const theme = createMuiTheme({
     typography: {
       fontFamily: [
@@ -38,14 +44,18 @@ const theme = createMuiTheme({
 let user = 'Alex';
 ReactDom.render(
     <HashRouter>
-        <Provider store = { initStore() }>
-            <ThemeProvider theme={theme}>
-                <CssBaseline></CssBaseline>
-                <Container maxWidth="lg">
-                    <Header usr={ user }/>
-                    <Router/>
-                </Container>
-            </ThemeProvider>
+        <Provider store = { store }>
+            <PersistGate loading={ null } persistor={ persistor }>
+                <ConnectedRouter history={ history }>
+                    <ThemeProvider theme={theme}>
+                        <CssBaseline></CssBaseline>
+                        <Container maxWidth="lg">
+                            <Header usr={ user }/>
+                            <Router/>
+                        </Container>
+                    </ThemeProvider>
+                </ConnectedRouter>
+            </PersistGate>
         </Provider>
     </HashRouter>, 
     document.getElementById("app")

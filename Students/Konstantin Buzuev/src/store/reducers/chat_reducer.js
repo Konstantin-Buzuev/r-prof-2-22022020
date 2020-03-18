@@ -1,110 +1,61 @@
 import update from 'react-addons-update'
 // ACTIONS
 import {
-    SEND_MSG
-} from '../actions/chat_actions.js'
-import {
-    ADD_CHAT
+    ADD_CHAT,
+    START_CHATS_LOADING,
+    SUCCESS_CHATS_LOADING,
+    ERROR_CHATS_LOADING
 } from '../actions/room_actions.js'
 
 
 let initialStore = {
-    chats: {
-        1: {
-            name: "Room 1",
-            description: "First room",
-            type: "normal",
-            messages: {
-                1: {
-                    user: null,
-                    text: "Welcome to Chat 1!"
-                },
-                2: {
-                    user: 'Darth Vader',
-                    text: 'I am your father'
-                },
-                3: {
-                    user: null,
-                    text: 'NOOOOOOOOO'
-                },
-            }
-        },
-        2: {
-            name: "Room 2",
-            description: "Second room",
-            type: "important",
-            messages: {
-                1: {
-                    user: null,
-                    text: "Welcome to Chat 2!"
-                },
-                2: {
-                    user: 'Darth Vader',
-                    text: 'Hello, Luke!'
-                },
-                3: {
-                    user: null,
-                    text: 'Go away!!!'
-                },
-            }
-
-        },
-        3: {
-            name: "Room 3",
-            description: "Third room",
-            type: "VIP",
-            messages: {
-                1: {
-                    user: null,
-                    text: "Welcome to Chat 3!"
-                },
-                2: {
-                    user: 'Darth Vader',
-                    text: 'Join the dark side!'
-                },
-                3: {
-                    user: null,
-                    text: 'Do you have a cookies?'
-                },
-            }
-
-        },
-    }
+    chats: {},
+    isLoading: true
 }
 
 export default function chatReducer(store = initialStore, action) {
     switch (action.type) {
-        case SEND_MSG: {
-            initialStore = update(store, {
-                chats: {
-                    [action.chatID]: {
-                        messages: {
-                            $merge: {
-                                [action.messageID]: {
-                                    user: action.sender,
-                                    text: action.text
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            return initialStore;
-        }
         case ADD_CHAT: {
-            initialStore = update(store, {
+            store = update(store, {
                 chats: {
                     $merge: {
                         [action.chatID]: {
                             name: action.name,
                             description: action.description,
                             type: action.chatType,
-                            messages: {}
                         }
                     }
                 }
             });
-            return initialStore;
+            return store;
+        }
+        case START_CHATS_LOADING: {
+            store = update(store, {
+                isLoading: {
+                    $set: true
+                },
+            });
+            return store;
+        }
+        case SUCCESS_CHATS_LOADING: {
+            const chats = action.payload;
+            store = update(store, {
+                chats: {
+                    $merge: chats
+                },
+                isLoading: {
+                    $set: false
+                },
+            });
+            return store;
+        }
+        case ERROR_CHATS_LOADING: {
+            store = update(store, {
+                isLoading: {
+                    $set: false
+                },
+            });
+            return store;
         }
 
         default:

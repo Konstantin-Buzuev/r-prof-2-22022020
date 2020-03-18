@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import ReactDom from "react-dom";
+import PropTypes from "prop-types";
 // ACTIONS
 import { sendMessage } from "../../../store/actions/chat_actions.js";
 // REDUX
@@ -19,25 +19,23 @@ const useStyles = theme => ({
   }
 });
 class MessageManager extends Component {
+  static propTypes = {
+    currentID: PropTypes.number.isRequired
+  };
+
   constructor(props) {
     super(props);
     this.state = {};
     this.state.message = "";
   }
   sendMessage = (text, sender) => {
-    const { messages } = this.props;
     const chatID = this.props.chatID;
-    const messageID = Object.keys(messages).length + 1;
-    this.props.sendMessage(chatID, messageID, sender, text);
+    const currentID = this.props.currentID;
+    this.props.sendMessage(currentID, chatID, sender, text);
   };
 
   handleSendMessage(message, sender) {
     this.sendMessage(message, sender);
-    if (sender === this.props.user) {
-      setTimeout(() => {
-        this.sendMessage(null, null);
-      }, 300);
-    }
     this.setState({ message: "" });
   }
 
@@ -46,11 +44,7 @@ class MessageManager extends Component {
     else this.handleSendMessage(this.state.message, this.props.user);
   };
 
-  scrollToBottom = () => {
-    this.messagesEndRef.current.lastElementChild.scrollIntoView({
-      behavior: "smooth"
-    });
-  };
+  componentDidMount() {}
 
   render() {
     const { classes } = this.props;
@@ -91,11 +85,9 @@ class MessageManager extends Component {
   }
 }
 
-const mapStateToProps = ({ chatReducer }, ownProps) => {
-  const { chatID } = ownProps;
-
+const mapStateToProps = ({ messageReducer }) => {
   return {
-    messages: chatReducer.chats[chatID].messages
+    currentID: messageReducer.messages.length + 1
   };
 };
 
@@ -106,6 +98,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withStyles(useStyles)(MessageManager));
-/*
-.chats[chatID].messages
-*/

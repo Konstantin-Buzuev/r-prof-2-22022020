@@ -46,7 +46,7 @@ export default class Layout extends React.Component {
       <ThemeProvider theme={theme}>
         <CssBaseline></CssBaseline>
         <Container maxWidth="lg">
-          <Header chatId={this.props.chatId} />
+          <Header chatID={this.props.chatID} />
           <Grid
             container
             direction="row"

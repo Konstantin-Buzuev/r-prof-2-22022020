@@ -1,6 +1,8 @@
 import update from 'react-addons-update'
 //import ACTIONS
-import { SEND_MSG } from '../actions/messages_actions.js'
+import {
+    SEND_MSG
+} from '../actions/messages_actions.js'
 
 const initialStore = {
     messages: {
@@ -27,7 +29,14 @@ export default function msgReducer(store = initialStore, action) {
     switch (action.type) {
         case SEND_MSG: {
             return update(store, {
-                messages: { $merge: { [action.messageId]: { user: action.sender, text: action.text } } }
+                messages: {
+                    $merge: {
+                        [action.messageID]: {
+                            user: action.sender,
+                            text: action.text
+                        }
+                    }
+                }
             });
         }
         default:

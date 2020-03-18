@@ -52,23 +52,34 @@ const useStyles = theme => ({
 });
 
 class ChatManager extends React.Component {
+  static propTypes = {
+    addChat: PropTypes.func.isRequired,
+    sendMessage: PropTypes.func.isRequired
+  };
+
   constructor(props) {
     super(props);
     this.state = {};
+    this.state.chatTypeValue = null;
     this.state.name = "";
     this.state.description = "";
     this.state.type = null;
-    this.state.label = null;
   }
 
-  handleChatIconChoose = (event, value) => {
-    if (value === null) this.setState({ type: null });
-    else this.setState({ type: value.type });
-  };
+  setType(newValue) {
+    if (newValue === null) this.setState({ type: null });
+    else this.setState({ type: newValue.type });
+    this.setState({ chatTypeValue: newValue });
+  }
 
   addChat(chatID, name, description, type) {
     this.props.addChat(chatID, name, description, type);
-    this.props.sendMessage(chatID, 1, null, `Welcome to  ${name} chatroom`);
+    this.props.sendMessage(
+      this.props.currentID,
+      chatID,
+      "Bot",
+      `Welcome to  ${name} chatroom`
+    );
   }
   handleAddChat(_name, _description, _type) {
     const { chats } = this.props;
@@ -78,7 +89,8 @@ class ChatManager extends React.Component {
       _description !== "" ? _description : `Room ${chatID} description`;
     let type = _type !== null ? _type : "normal";
     this.addChat(chatID, name, description, type);
-    this.setState({ name: "", description: "", label: null, type: null });
+    this.setState({ name: "", description: "", type: null });
+    this.setType(null);
   }
   handleChange = event => {
     if (event.keyCode !== 13) {
@@ -97,6 +109,20 @@ class ChatManager extends React.Component {
       this.state.type
     );
   };
+  componentDidMount() {
+    fetch("staticapi/chats.json")
+      .then(body => body.json())
+      .then(json => {
+        Object.keys(json).forEach(key => {
+          this.props.addChat(
+            key,
+            json[key].name,
+            json[key].description,
+            json[key].type
+          );
+        });
+      });
+  }
 
   render() {
     const { classes } = this.props;
@@ -135,8 +161,10 @@ class ChatManager extends React.Component {
             size="small"
             options={chatTypes}
             className={classes.textField}
-            onChange={this.handleChatIconChoose}
-            value={this.state.label}
+            value={this.state.chatTypeValue}
+            onChange={(event, newValue) => {
+              this.setType(newValue);
+            }}
             getOptionLabel={option => option.label}
             renderOption={option => {
               if (option !== "")
@@ -170,9 +198,10 @@ class ChatManager extends React.Component {
   }
 }
 
-const mapStateToProps = ({ chatReducer }) => {
+const mapStateToProps = ({ chatReducer, messageReducer }) => {
   return {
-    chats: chatReducer.chats
+    chats: chatReducer.chats,
+    currentID: messageReducer.messages.length + 1
   };
 };
 

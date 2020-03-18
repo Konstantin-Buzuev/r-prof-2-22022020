@@ -13,6 +13,7 @@ module.exports = {
     },
     mode: 'development', //'production'
     // mode: 'production',
+    devtool: 'eval-source-map',
     devServer: {
         contentBase: './dist',
         port: 3000,

@@ -19,12 +19,6 @@ const useStyles = theme => ({
     flexDirection: "column",
     justifyContent: "space-between",
     height: "100%"
-  },
-  gridList: {
-    width: "100%"
-  },
-  bottomPanel: {
-    padding: "10px"
   }
 });
 
