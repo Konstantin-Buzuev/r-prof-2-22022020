@@ -84,6 +84,9 @@ body {
     "chats"
     "msgs";
   }
+  .chats-list {
+    max-height: 120px;
+  }
 }
 
 .chat-item,
@@ -156,4 +159,18 @@ body {
 .chat-input,
 .msg-input {
   flex-grow: 1;
+}
+
+@keyframes blinking {
+  0%{
+    color: #ff3d50;
+  }
+  100%{
+    color: #222291;
+  }
+}
+ 
+.blink1s {
+  /* NAME | TIME | ITERATION */
+  animation: blinking .5s 4;
 }

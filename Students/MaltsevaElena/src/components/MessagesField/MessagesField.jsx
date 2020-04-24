@@ -3,11 +3,24 @@ import ReactDom from 'react-dom'
 import PropTypes from 'prop-types'
 
 // Styles, UI
-import { Input, IconButton, Box } from '@material-ui/core'
-import { Send, SentimentVerySatisfiedRounded, AttachmentRounded } from '@material-ui/icons'
+import { Input, 
+         IconButton, 
+         Box } from '@material-ui/core'
+import { Send, 
+         SentimentVerySatisfiedRounded, 
+         AttachmentRounded, 
+         ForumRounded } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
 
 const useStyles = (theme => ({
+   emptyBlock: {
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      color: theme.palette.text.secondary,
+   },
    msgBlock: {
       height: 'calc(100vh - 160px)',
       display: 'flex',
@@ -33,9 +46,8 @@ import Message from '../Message/Message.jsx'
 
 class Messages extends Component {
    static propTypes = {
-      chatId: PropTypes.number.isRequired,
-      chatRooms: PropTypes.object.isRequired,
-      messages: PropTypes.object.isRequired,
+      chatId: PropTypes.string,
+      chatData: PropTypes.object,
       sendMessage: PropTypes.func.isRequired,
       classes: PropTypes.object
    }
@@ -54,11 +66,8 @@ class Messages extends Component {
    }
 
    sendMsg = ( text, sender ) => {
-      let { chatId, messages, sendMessage } = this.props
-      let chatMessages = messages[chatId]
-      const messageId = Object.keys(chatMessages).length + 1
-
-      sendMessage(chatId, messageId, sender, text)
+      let { chatId, sendMessage } = this.props
+      sendMessage(sender, text, chatId)
    }
 
    handleSendMsg = (text, sender) => {
@@ -80,19 +89,18 @@ class Messages extends Component {
    }
 
    render() {
-      let { chatId, chatRooms, messages, classes } = this.props
-      let chatMessages = messages[chatId]
-
+      let { chatId, chatData, classes } = this.props
+      
       let MessagesArr = []
-      if (chatMessages) {
-         Object.keys(chatMessages).forEach(messageId => {
+      if (chatId && chatData) {
+         let chatMessages = chatData.messageList
+         Object.keys(chatMessages).forEach(message => {
             MessagesArr.push( 
                <Message 
-                  sender={ chatMessages[messageId].user } 
-                  text={ chatMessages[messageId].text } 
-                  key={ messageId }
-                  chatId={ chatId }
-                  chatRooms={ chatRooms }
+                  sender={ chatMessages[message].sender } 
+                  text={ chatMessages[message].text } 
+                  key={ chatMessages[message]._id }
+                  botName={ chatData.title }
                /> 
             )
          })
@@ -100,38 +108,45 @@ class Messages extends Component {
 
       return (
          <div>
-         { chatMessages && <div>
-            {/* Header: chat's title, search and other functions */}
-            <Header title={ chatRooms[chatId].title }/>
+            {/* Shown while chat isn't selected */}
+            { !chatId && <Box className={ classes.emptyBlock }>
+               <ForumRounded fontSize="large"/>
+               Select a chat to start conversation
+            </Box> }
 
-            {/* Main: messages history */}
-            <Box className={ classes.msgBlock }>
-               <Box className={ classes.msgList } ref={ this.msgList }>
-                  { MessagesArr ? MessagesArr : '' }
-               </Box>
-            </Box>
+            {/* Shown when chat is selected */}
+            { chatId && <div>
+               {/* Header: chat's title, search and other functions */}
+               <Header title={ chatData ? chatData.title : '' }/>
 
-            {/* Footer: new message input and additional options */}
-            <Box className={ classes.sendForm }>
-               <Box width="85%" mr={2}>
-                  <Input placeholder="Type your message..."
-                     autoFocus={ true }
-                     fullWidth={ true }
-                     onChange={ this.handleChange } 
-                     onKeyUp={ this.handleChange }
-                     value={ this.state.msg } />
+               {/* Main: messages history */}
+               <Box className={ classes.msgBlock }>
+                  <Box className={ classes.msgList } ref={ this.msgList }>
+                     { MessagesArr ? MessagesArr : '' }
+                  </Box>
                </Box>
-               <IconButton aria-label="send" onClick={ () => this.handleSendMsg(this.state.msg, this.state.usr ) }>
-                  <Send />
-               </IconButton>
-               <IconButton aria-label="smile">
-                  <SentimentVerySatisfiedRounded />
-               </IconButton>
-               <IconButton aria-label="attachment" >
-                  <AttachmentRounded />
-               </IconButton>
-            </Box>
-         </div> }
+
+               {/* Footer: new message input and additional options */}
+               <Box className={ classes.sendForm }>
+                  <Box width="85%" mr={2}>
+                     <Input placeholder="Type your message..."
+                        autoFocus={ true }
+                        fullWidth={ true }
+                        onChange={ this.handleChange } 
+                        onKeyUp={ this.handleChange }
+                        value={ this.state.msg } />
+                  </Box>
+                  <IconButton aria-label="send" onClick={ () => this.handleSendMsg(this.state.msg, this.state.usr ) }>
+                     <Send />
+                  </IconButton>
+                  <IconButton aria-label="smile">
+                     <SentimentVerySatisfiedRounded />
+                  </IconButton>
+                  <IconButton aria-label="attachment" >
+                     <AttachmentRounded />
+                  </IconButton>
+               </Box>
+            </div> }
          </div>
       )
    }

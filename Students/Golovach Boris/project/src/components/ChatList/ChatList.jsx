@@ -31,7 +31,7 @@ class ChatList extends React.Component {
     handleAdd = () => {
         let { chats } = this.props
         const chatId = Object.keys(chats).length + 1;
-
+        
         if (this.state.input !== '') {
             this.props.addChat(chatId, this.state.input)
             this.setState({ input: '' })
@@ -43,7 +43,7 @@ class ChatList extends React.Component {
         let chatsArray = []
         Object.keys(chats).forEach(key => {
             chatsArray.push(
-            <Link to={ `/chat/${key}` }>
+            <Link to={ `/chat/${key}` } key={ key }>
                 <ListItem primaryText={chats[key].title} leftIcon = { <ContentSend /> } />
             </Link>
             )

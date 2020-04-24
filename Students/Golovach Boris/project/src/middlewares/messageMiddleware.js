@@ -18,7 +18,7 @@ export default store => next => (action) => {
                         sendMessage(
                             action.messageId + 1,
                             'Bot', 
-                            'Persist успешно подключен',
+                            'Заяц – Волк',
                             action.chatId, 
                         )
                     ), 1000)

@@ -40,21 +40,6 @@ class Layout extends React.Component {
             </Row>
             <Messages  usr = { this.props.usr } chatId = {this.props.chatId} />
           </Container>
-
-
-            
-            // <div className="d-flex justify-content-center w-100 layout">
-            //     <div className="d-flex w-100 justify-content-center layout-left-side">
-            //         <Header chatId = { this.props.chatId }/>
-            //         <div className="pr-5">
-            //             <ChatList />
-            //         </div>
-            //         <div className="layout-right-side">
-            //             <MessagesField usr = { this.props.usr }/>
-            //         </div>
-            //     </div>
-                
-            // </div>
         )
     }
 }

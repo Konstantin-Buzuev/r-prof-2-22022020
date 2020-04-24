@@ -8,7 +8,11 @@ import { AppBar,
         IconButton, 
         Menu, MenuItem, 
         ListItemIcon, ListItemText } from '@material-ui/core'
-import { ForumRounded, AccountCircleRounded, Settings, Face, Notifications, Lock, Tune } from '@material-ui/icons'
+import { ForumRounded, 
+        AccountCircleRounded, 
+        Settings, 
+        Face, 
+        Tune } from '@material-ui/icons'
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -16,7 +20,6 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
     boxShadow: 'none',
-    borderTop: '1px solid',
     borderColor: theme.palette.primary.main
   },
   toolbar: {
@@ -24,13 +27,9 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const StyledMenu = withStyles({
-  paper: {
-    border: '1px solid #2C2C6A',
-  },
-})(props => (
+const StyledMenu = withStyles({})(props => (
   <Menu
-    elevation={0}
+    elevation={5}
     getContentAnchorEl={null}
     anchorOrigin={{
       vertical: 'top',
@@ -89,18 +88,6 @@ let navigation = () => {
               <Face fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="My account" />
-          </StyledMenuItem>
-          <StyledMenuItem>
-            <ListItemIcon>
-              <Notifications fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Notifications" />
-          </StyledMenuItem>
-          <StyledMenuItem>
-            <ListItemIcon>
-              <Lock fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Privacy & security" />
           </StyledMenuItem>
           <StyledMenuItem>
             <ListItemIcon>

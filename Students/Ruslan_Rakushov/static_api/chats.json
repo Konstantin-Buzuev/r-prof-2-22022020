@@ -1,0 +1,8 @@
+{
+  "chats": {
+    "1": { "title": "Chat 1" },
+    "2": { "title": "Chat 2" },
+    "3": { "title": "Chat 3" }
+  },
+  "currentChatId": 1
+}

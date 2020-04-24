@@ -25,8 +25,8 @@ let msg = (props) => {
 
    const classes = useStyles()
 
-   let { sender, text, chatId, chatRooms} = props
-   sender ? sender = sender : sender = chatRooms[chatId].title
+   let { sender, text, botName} = props
+   sender = (sender === 'bot' ? botName : sender)
 
    let boxView = (sender === 'Me' ? classes.myAnswer : classes.botAnswer)
 

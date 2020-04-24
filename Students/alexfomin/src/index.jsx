@@ -2,26 +2,25 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './assets/style.css';
-//import { Container, Badge, Row, Col } from 'reactstrap';
-//import Messages from './components/MessagesField/MessagesField.jsx'
-//import Search from './components/Search/Search.jsx'
-//import SendButton from './components/Button/Button.jsx';
-import { Provider } from 'react-redux'
-import initStore from './store/store.js'
-import Router from './router/router.jsx'
-import { BrowserRouter } from 'react-router-dom'
+import { Provider } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router';
+import initStore, { history } from './store/store.js';
+import Router from './router/router.jsx';
+import { PersistGate } from 'redux-persist/integration/react';
+//import { BrowserRouter } from 'react-router-dom'
 
 //let InitStore = initStore()
+const { store, persistor } = initStore();
 
-
-//console.log(initStore.getState())
 
   ReactDom.render (
-    <BrowserRouter>
-        <Provider store = { initStore() }>
-                <Router />
+        <Provider store = { store }>
+          <PersistGate loading={ null } persistor={ persistor }>
+          <ConnectedRouter history={history}>
+            <Router />
+          </ConnectedRouter>
+          </PersistGate>
         </Provider>
-    </BrowserRouter>
     , document.getElementById('app')
 );
 

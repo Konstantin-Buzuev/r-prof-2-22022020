@@ -1,99 +1,86 @@
 import update from 'react-addons-update';
 
-import { ADD_CHAT } from '../actions/chats_actions.js';
-import { SEND_MSG } from '../actions/messages_actions.js';
+import { defaultChatId } from '../../../server/models/chat';
+import {
+  CHANGE_CHAT,
+  START_CHATS_LOADING,
+  SUCCESS_CHATS_LOADING,
+  ERROR_CHATS_LOADING,
+  START_GET_CHAT,
+  SUCCESS_GET_CHAT,
+  ERROR_GET_CHAT,
+  START_ADD_CHAT,
+  SUCCESS_ADD_CHAT,
+  ERROR_ADD_CHAT } from '../actions/chats_actions.js';
 
 const initialStore = {
-  chats: {
-    1: {
-      title:  'Чат 1',
-      user:   'Я',
-      bot:    'робот',
-      msgList: [
-        {
-          sender: 'Darth Vader',
-          text:   'Hallo'
-        },
-        {
-          sender: null,
-          text:   null
-        },
-        {
-          sender: 'Darth Vader',
-          text:   'I am your father'
-        },
-        {
-          sender: null,
-          text:   'NOOOOOOOOO'
-        }
-      ]
-    },
-    2: {
-      title:  'Chat 2',
-      user:   'Me',
-      bot:    'bot',
-      msgList: [
-        {
-          sender: 'Geek',
-          text:   'Превед!'
-        },
-        {
-          sender: null,
-          text:   null
-        },
-        {
-          sender: 'Geek',
-          text:   'Чё ты гонишь?'
-        }
-      ]
-    },
-    3: {
-      title:  'Курам на смех!',
-      user:   'Васисуалий Пупкин-Таврический',
-      bot:    'конь-голова',
-      msgList: [
-        {
-          sender: 'Администратор',
-          text:   'Всем выйти из чата!'
-        },
-        {
-          sender: null,
-          text:   null
-        }
-      ]
-    }
-  }
+  chatId: defaultChatId, 
+  chats: {},
+  isLoading: false
 };
 
-export default function chatReducer(store = initialStore, action) {
+export default function chatsReducer(store = initialStore, action) {
   switch(action.type) {
-    case SEND_MSG: {
+    case CHANGE_CHAT:
       return update(store, {
-        chats: { $merge: { 
-            [action.chatsId]: {
-              title: store.chats[action.chatId].title,
-              msgList: [...store.chats[action.chatId].msgList, action.msgId]
+        chatId: {$set: action.chatId}
+      });
+      break;
+
+    case START_CHATS_LOADING: 
+      return update (store, {
+        isLoading : { $set : true },
+      });
+      break;
+
+    case SUCCESS_CHATS_LOADING: 
+      const chats = {};
+      action.payload.forEach(chat => {
+        const { title, user, bot } = chat;
+        chats[chat._id] = { title , user, bot };
+      });
+
+      return update(store, {
+        chats: { $set: chats },
+        isLoading: { $set: false },
+      });
+      break;
+
+    case ERROR_CHATS_LOADING:
+      return update (store, {
+        isLoading: { $set: false },
+      });
+      break;
+
+    case SUCCESS_GET_CHAT: 
+      const chat = {
+        _id:    action.payload._id,
+        title:  action.payload.title,
+        user:   action.payload.user,
+        bot:    action.payload.bot
+      };
+
+      return update(store, {
+        chat: { $set: chat },
+      });
+      break;
+
+    case SUCCESS_ADD_CHAT: 
+      return update(store, {
+        chats: { 
+          $merge: { 
+            [action.payload._id]: { 
+                title: action.payload.title,
+                user: action.payload.user,
+                bot: action.payload.bot
             } 
           } 
         }
       });
-    }
-    case ADD_CHAT: {
-      const chatId = Object.keys(store.chats).length + 1;
-
-      return update(store, {
-          chats: { 
-            $merge: { 
-              [chatId]: { 
-                  title: action.title, 
-                  msgList: []
-              } 
-            } 
-          }
-      });
-    }
-    default: {
+      break;
+      
+    default:
       return store;
-    }
+      break;
   };
 };

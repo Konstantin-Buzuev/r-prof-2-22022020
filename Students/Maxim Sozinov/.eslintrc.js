@@ -28,5 +28,7 @@ module.exports = {
         "no-unused-vars": "warn",
         "react/state-in-constructor": "off",
         "react/no-string-refs": "warn",
+        "no-empty": "warn",
+        "no-undef": "warn",
     }
 };

@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import { AppBar, 
          Box,
          Button,
+         CircularProgress,
          Dialog, DialogActions, DialogContent, DialogTitle, 
          List, 
          Input, InputBase,
@@ -50,20 +51,19 @@ import Navigation from '../ChatsNavigation/ChatsNavigation.jsx'
 
 class ChatList extends Component {
    static propTypes = {
-      chatId: PropTypes.number.isRequired,
+      chatId: PropTypes.string,
       chatRooms: PropTypes.object.isRequired,
+      isLoading: PropTypes.bool.isRequired,
       addChat: PropTypes.func.isRequired,
-      addChatToMsgStore: PropTypes.func.isRequired,
       deleteChat: PropTypes.func.isRequired,
       push: PropTypes.func.isRequired,
-      messages: PropTypes.object.isRequired,
       classes: PropTypes.object
    }
 
    state = {
-      input: '',
       openDialog: false,
-      search: ''
+      inputChatTitle: '',
+      inputSearch: ''
    }
 
    handleNavigate = (link) => {
@@ -76,18 +76,14 @@ class ChatList extends Component {
 
    handleKeyUp = (event) => {
       if (event.keyCode === 13) {
-         this.handleAdd()
+         this.handleAddChat()
       }
    }
 
-   handleAdd = () => {
-      let { chatRooms, addChat, addChatToMsgStore } = this.props
-      const newChatId = Object.keys(chatRooms).length + 1
-
-      if ( this.state.input !== '') {
-         addChat(newChatId, this.state.input)
-         addChatToMsgStore(newChatId)
-         this.setState({ input: '' })
+   handleAddChat = () => {
+      if ( this.state.inputChatTitle !== '') {
+         this.props.addChat(this.state.inputChatTitle)
+         this.setState({ inputChatTitle: '' })
          this.handleClickOpenClose()
       }
    }
@@ -97,22 +93,22 @@ class ChatList extends Component {
    }
 
    render() {
-      const { chatId, chatRooms, deleteChat, messages, classes } = this.props
+      const { chatId, chatRooms, deleteChat, classes } = this.props
 
       let ChatRoomsArr = []
       Object.keys(chatRooms).forEach(chatRoomId => {
-         let lastMsgIndex
-         messages[chatRoomId] ? lastMsgIndex = Object.keys(messages[chatRoomId]).length : ''
+         if (chatRooms[chatRoomId] !== undefined ) {
+            let chatMessages = chatRooms[chatRoomId].messageList
+            let lastMsgIndex = chatMessages.length - 1
          
-         if (chatRooms[chatRoomId] !== undefined) {
             ChatRoomsArr.push( 
                <Chat 
                   handleNavigate={ this.handleNavigate }
                   chatRoomId={ chatRoomId }
                   deleteChat={ deleteChat }
                   title={ chatRooms[chatRoomId].title }
-                  message={ lastMsgIndex ? messages[chatRoomId][lastMsgIndex].text : '* No messages yet *'}
-                  isSelected={ chatId === +chatRoomId }
+                  lastMessage={ chatMessages.length ? chatMessages[lastMsgIndex].text : '* No messages yet *'}
+                  isSelected={ chatId === chatRoomId }
                   key={ chatRoomId }
                />
             )
@@ -120,8 +116,8 @@ class ChatList extends Component {
       })
 
       let ChatRoomsFiltered = []
-      if (this.state.search !== '') {
-         let searchRequest = new RegExp(this.state.search, 'gi')
+      if (this.state.inputSearch !== '') {
+         let searchRequest = new RegExp(this.state.inputSearch, 'gi')
          ChatRoomsFiltered = ChatRoomsArr.filter(room => {
             return searchRequest.test(room.props.title)
          })
@@ -139,10 +135,10 @@ class ChatList extends Component {
                   </IconButton>
                   <Search />
                   <InputBase aria-label="search" className={ classes.inputSearch }
-                     name="search"
+                     name="inputSearch"
                      placeholder="Search..."
                      onChange={ this.handleChange }
-                     value={ this.state.search }
+                     value={ this.state.inputSearch }
                   />
                </Toolbar>
             </AppBar>
@@ -152,27 +148,28 @@ class ChatList extends Component {
                <DialogTitle>Create new chat</DialogTitle>
                <DialogContent>
                   <Input autoFocus fullWidth margin="dense"
-                     name="input"
+                     name="inputChatTitle"
                      placeholder="Type chat's title here..."
                      onChange={ this.handleChange }
                      onKeyUp={ this.handleKeyUp }
-                     value={ this.state.input }
+                     value={ this.state.inputChatTitle }
                   />
                </DialogContent>
                <DialogActions>
                   <Button onClick={ this.handleClickOpenClose } className={ classes.cancelBtn }>
                      Cancel
                   </Button>
-                  <Button onClick={ this.handleAdd } color="secondary">
+                  <Button onClick={ this.handleAddChat } color="secondary">
                      Create
                   </Button>
                </DialogActions>
             </Dialog>
 
             {/* Main: chats list */}
+            { this.props.isLoading ? <CircularProgress/> :
             <List className={ classes.chatList }>
                { ChatRoomsFiltered }
-            </List>
+            </List> }
 
             {/* Footer: tabbar (bottom menu) */}
             <Navigation />

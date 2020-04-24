@@ -1,0 +1,23 @@
+.msgText {
+    width: 500px;
+    padding: 10px 16px;
+    font-size: 18px;
+    border: 1px solid lightblue;
+    border-radius: 20px;
+}
+.msgBtn {
+    margin: 4px;
+    background: rgb(76, 140, 161);
+    color: #fff;
+    padding: 10px 16px;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    font-size: 18px;
+}
+.msgBtn:hover {
+    background:  lightblue;
+}
+.msgText:focus,.msgBtn:focus {
+  outline: none;
+  border-color: steelblue;
+}

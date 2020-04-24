@@ -5,3 +5,16 @@ body {
    font-family: 'Roboto', sans-serif;
    background-color: #141433;
 }
+.container {
+   width: 90%;
+   height: 100%;
+   margin: 0 auto;
+}
+
+.container_position__center {
+   height: 100vh;
+   display: flex;
+   justify-content: center;
+   align-items: flex-start;
+   padding-top: 20%;
+}

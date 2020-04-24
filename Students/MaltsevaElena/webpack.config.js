@@ -8,7 +8,7 @@ module.exports = {
    },
    output: {
       path: path.join(__dirname, 'dist'),
-      publicPath: '',
+      publicPath: '/',
       filename: 'js/bundle.js'
    },
    mode: 'development',
@@ -19,9 +19,15 @@ module.exports = {
       port: 3000,
       hot: true,
       open: true,
-      historyApiFallback: {
-         index: 'index.html'
-      }
+      historyApiFallback: true,
+      proxy: {
+         '/api': {
+            target: 'http://localhost:3300',   
+            pathRewrite: { '^/api' : '' },
+            secure: false,
+            changeOrigin: true,
+         }
+      },
    },
    module: {
       rules: [

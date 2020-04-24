@@ -19,7 +19,14 @@ module.exports = {
         hot: true,
         open: true,
         historyApiFallback: true, // отвечает файлом index.html на все запросы по незнакомым URL. 
-
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3300',
+                pathRewrite: { '^/api' : '' },
+                secure: false,
+                changeOrigin: true
+            }
+        },
     },
     module: {
         rules: [

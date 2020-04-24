@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-//import ReactDom from 'react-dom';
+import ReactDom from 'react-dom';
 
-import { sendMessage } from "../../store/actions/messages_actions";
+import { sendMessage, loadMessages } from "../../store/actions/messages_actions";
 
 import
 { Box,
@@ -11,6 +11,7 @@ import
   FloatingActionButton,
   Fab,
   Icon } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Message from '../Message/Message.jsx'
 
@@ -36,53 +37,37 @@ const useStyles = (theme => ({
    }
 }));
 
-// import botData from './botData.json';
-// const randomBotData = () => Math.floor(Math.random() * botData.emoji.length);
-// const randomBotEmoj = () => String.fromCodePoint(botData.emoji[randomBotData()]);
-// const randomBotMsg = () => botData.msg[randomBotData()];
-const scrolledId = 'scrolled_msg';
+const scrolledId = 'last_msg';
 
 import { bindActionCreators } from "redux";
 import connect from "react-redux/es/connect/connect";
 import PropTypes from "prop-types";
+import { Types } from 'mongoose';
 
 class Messages extends Component {
     static propTypes = {
-      chatId: PropTypes.number.isRequired,
+      chatId: PropTypes.string.isRequired,
       chats: PropTypes.object.isRequired,
+      msgs: PropTypes.object.isRequired,
       sendMessage: PropTypes.func.isRequired,
+      isLoading: PropTypes.bool.isRequired,
     };
     
+    state = { msg: '' };
+    
     constructor(props) {
-        super(props);
-        
-        this.scrolledEl = null;
-        //this.botPrefix = `${this.props.chats[this.props.chatId].bot} :: `;
-
-        this.state = {
-          msgArray: this.props.chats[this.props.chatId].msgList.map((msg, index) => {
-            return {
-              msgId: index + 1,
-              sender: msg.sender || `${this.props.chats[this.props.chatId].bot}`,
-              text: msg.text || String.fromCodePoint(0x1F47D)
-            }
-          })
-        };
+      super(props);
+      this.scrolledEl = null;
     };
 
     _sendMessage = (e) => {
       this.props.sendMessage(
+        new (Types.ObjectId),
         this.props.chatId,
-        this.state.msgArray.length + 2,
         this.props.chats[this.props.chatId].user,
-        this.state.msg || ''
-      )
+        this.state.msg || `... ${String.fromCodePoint(0x1F43E)}`
+      );
       this.setState ({
-          msgArray: [...this.state.msgArray, {
-            msgId: this.state.msgArray.length + 2,
-            sender: this.props.chats[this.props.chatId].user,
-            text: this.state.msg || ''
-          }],
           msg: '' // clear input field
       });
     };
@@ -94,98 +79,95 @@ class Messages extends Component {
     
     scrollToBottom = () => {
       if(this.scrolledEl) 
-        this.scrolledEl.scrollIntoView();
+        this.scrolledEl.scrollIntoView({behavior: "smooth"});
     };
 
     componentDidMount() {
+      this.props.loadMessages(this.props.chatId);
       this.scrolledEl = document.getElementById(scrolledId);
       this.scrollToBottom();
     };
     
     componentDidUpdate(prevProps, prevState) {
-      // if(prevState.msgArray.length < this.state.msgArray.length
-        // &&
-        // this.state.msgArray.length % 2 === 1)
-        // {
-            // setTimeout(() => {
-                // this.setState ({
-                    // msgArray: [...this.state.msgArray, 
-                      // {
-                        // msgId: this.state.msgArray.length + 2,
-                        // sender: `${this.botPrefix}${randomBotEmoj()}`,
-                        // text: randomBotMsg() 
-                      // }
-                    // ],
-                    // msg: ''
-                // });
-            // }, 500)
-        // };
-      
+      if(this.props.chatId !== prevProps.chatId) 
+        this.props.loadMessages(this.props.chatId);
       this.scrollToBottom();
     }
     
     render() {
-      let { sender } = this.props.chats[this.props.chatId],
-        { classes } = this.props;
+      if(this.props.isLoading) {
+        return <CircularProgress />
+      };
+      
+      const placeholder = `Новое сообщение ...`;
+      
+      let { chats, chatId, msgs, classes } = this.props,
+        msgArray = [];
+        
+      if(msgs) {
+        Object.keys(msgs).forEach(key => {
+          let { sender, text } = msgs[key],
+            userName = sender || chats[chatId].bot;
+          msgArray.push(
+            <Message
+              sender={ userName }
+              text={ msgs[key].text }
+              bot={ userName === chats[chatId].bot } 
+              self={ userName === chats[chatId].user }
+              key={ key }
+            />
+          );
+        });
+      } else {
+        // empty msgList
+        console.log('empty msgs list');
+      };
 
-        const placeholder = `Новое сообщение ...`;
-      
-      let MessagesArr = this.state.msgArray.map( message =>
-        <Message
-          sender={ message.sender }
-          text={ message.text }
-          //bot={ message.sender.slice(0, this.botPrefix.length) === this.botPrefix } 
-          bot={ message.sender.slice(0, this.props.chats[this.props.chatId].bot.length) === this.props.chats[this.props.chatId].bot } 
-          self={ message.sender === this.props.chats[this.props.chatId].user }
-          key={ message.msgId }
-        />
-      );
-      
       return (
-          <div className="msgs-body">
-              
-              <Box ref="messageList" className={ `msgs-list ${classes.root}` }>
-                  { MessagesArr }
-                  <div id={ scrolledId } />
-              </Box>
-              
-              <Divider variant="middle" />
-                  
-              <Box className={ `msgs-foot ${classes.foot}` }>
-                      
-                <TextField
-                  className="msg-input"
-                  autoFocus
-                  color="secondary"
-                  variant = "filled"
-                  placeholder = { placeholder }
-                  onChange = { this.handleChange }
-                  onKeyUp = { this.handleChange }
-                  value = { this.state.msg || '' }
-                  InputProps={{ className: classes.input }}
-                />
-                
-                <Fab
-                  className={classes.hovered}
-                  color="primary"
-                  aria-label="add"
-                  onClick = { this._sendMessage }
-                >
-                  <Icon>send</Icon>
-                </Fab>
-
-              </Box>
-          </div>
+        <div className="msgs-body">
+          <Box className={ `msgs-list ${classes.root}` }>
+            { msgArray }
+            <div id={ scrolledId } />
+          </Box>
+          
+          <Divider variant="middle" />
+          
+          <Box className={ `msgs-foot ${classes.foot}` }>
+            <TextField
+              className="msg-input"
+              autoFocus
+              color="secondary"
+              variant = "filled"
+              placeholder = { placeholder }
+              onChange = { this.handleChange }
+              onKeyUp = { this.handleChange }
+              value = { this.state.msg || '' }
+              InputProps={{ className: classes.input }}
+            />
+            
+            <Fab
+              className={classes.hovered}
+              color="primary"
+              aria-label="add"
+              onClick = { this._sendMessage }
+            >
+              <Icon>send</Icon>
+            </Fab>
+          </Box>
+        </div>
       );
     };
 };
 
-const mapStateToProps = ({ chatsReducer }) => ({
-  chats: chatsReducer.chats
+const mapStateToProps = ({ chatsReducer, msgReducer }) => ({
+  chatId: chatsReducer.chatId,
+  chats: chatsReducer.chats,
+  msgs: msgReducer.msgs,
+  isLoading: chatsReducer.isLoading,
 });
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ sendMessage }, dispatch);
+  bindActionCreators( { sendMessage, loadMessages }, dispatch);
 
 export default
   connect(mapStateToProps, mapDispatchToProps)

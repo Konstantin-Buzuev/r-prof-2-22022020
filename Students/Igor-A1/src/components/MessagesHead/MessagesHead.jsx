@@ -39,12 +39,23 @@ const LightTooltip = withStyles(theme => ({
   },
 }))(Tooltip);
 
+import { getChat } from '../../store/actions/chats_actions' ;
+
 class MessagesHead extends Component {
   static propTypes = {
-    chatId: PropTypes.number,
-    chats: PropTypes.object.isRequired,
+    chatId: PropTypes.string,
+    getChat: PropTypes.func.isRequired,
   };
   
+  componentDidMount() {
+    this.props.getChat(this.props.chatId);
+  }
+  
+  componentDidUpdate(prevProps, prevState) {
+    if(this.props.chatId !== prevProps.chatId) 
+      this.props.getChat(this.props.chatId);
+  };
+    
   render() {
     let { classes } = this.props;
     
@@ -59,7 +70,7 @@ class MessagesHead extends Component {
             </LightTooltip >
             
             <Typography className={ classes.title } >
-              { `:: ${this.props.chats[this.props.chatId].user} ::` }
+              { `:: ${this.props.chat ? this.props.chat.user : ''} ::` }
             </Typography>
             
             <LightTooltip  className={ classes.tooltip } arrow title="поиск" aria-label="поиск" placement="left">
@@ -75,12 +86,13 @@ class MessagesHead extends Component {
 };
 
 const mapStateToProps = ({ chatsReducer }) => ({
-  chats: chatsReducer.chats
+  chat: chatsReducer.chat,
+  chatId: chatsReducer.chatId
 });
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({}, dispatch);
+  bindActionCreators({ getChat }, dispatch);
   
 export default
-  connect(mapStateToProps,)
+  connect(mapStateToProps, mapDispatchToProps)
     (withStyles(useStyles)(MessagesHead));

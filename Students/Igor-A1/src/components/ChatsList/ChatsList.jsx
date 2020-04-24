@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import { Link } from 'react-router-dom';
-
 import { List, 
          ListItem, 
          ListItemAvatar, 
@@ -59,25 +57,34 @@ const useStyles = theme => ({
     padding: theme.spacing(2)
   },
   input: {
-   color: "#FFF59D", // Yellow_50["200"]
+    autocomplete: "off",
+    color: "#FFF59D", // Yellow_50["200"]
   }
 });
+
+const scrolledId = 'last_chat';
+const defaultUserName = 'Я';
+const defaultBotName = 'чат-бот';
 
 import { bindActionCreators } from "redux";
 import connect from "react-redux/es/connect/connect";
 import PropTypes from "prop-types";
-import { addChat } from '../../store/actions/chats_actions' ;
+import { Types } from 'mongoose';
+import { push } from 'connected-react-router';
+import { changeChat, loadChats, addChat } from '../../store/actions/chats_actions' ;
 
 class ChatsList extends Component {
   static propTypes = {
     chats: PropTypes.object.isRequired,
     addChat: PropTypes.func.isRequired,
+    loadChats: PropTypes.func.isRequired,
+    push: PropTypes.func.isRequired,
     classes: PropTypes.object,
   };
 
   state = {
     input: '',
-    selectedIndex: this.props.chatId - 1
+    selectedIndex: 0
   };
 
   handleListItemClick = (e, index) => {
@@ -96,32 +103,60 @@ class ChatsList extends Component {
 
   handleAdd = () => {
     if(this.state.input !== '') {
-      this.props.addChat(this.state.input)
+      this.props.addChat(
+        new (Types.ObjectId),
+        this.state.input,
+        defaultUserName,
+        defaultBotName
+      )
       this.setState({ input: '' })
     };
   };
   
+  handleNavigate = (key, index) => {
+    this.setState({ selectedIndex: index });
+    this.props.push(`/chat/${key}`);
+    //console.log('this.props:', this.props)
+    this.props.changeChat(key);
+  };
+  
+  scrollToBottom = () => {
+    if(this.scrolledEl) 
+      this.scrolledEl.scrollIntoView();
+  };
+
+  componentDidMount() {
+    this.props.loadChats();
+    this.scrolledEl = document.getElementById(scrolledId);
+    this.scrollToBottom();
+  };
+  
+  componentDidUpdate(prevProps, prevState) {
+    this.scrollToBottom();
+  }
+  
   render() {
     const { classes, chats } = this.props;
-    //console.log(this.props);
     
     const chatsArray = [];
     Object.keys(chats).forEach((key, index) => {
       chatsArray.push((
-        <Link to={ `/chat/${key}` } style={{ textDecoration: 'none' }} key={ key }>
+        <div key={ key }>  
           <ListItem
             button
             className={ classes.item } 
             selected={this.state.selectedIndex === index}
-            onClick={ e => this.handleListItemClick(e, index)}
+            onClick={ () => this.handleNavigate(key, index) }
           >
             <ListItemAvatar>
               <Avatar className={ classes.avatar } ><Icon>chat</Icon></Avatar>
             </ListItemAvatar>
+            
             <ListItemText primary={ chats[key].title } />
+            
           </ListItem>
           <Divider variant="middle" component="li" />
-        </Link>
+        </div>
       ))
     });
     
@@ -129,6 +164,7 @@ class ChatsList extends Component {
         <div className="chats-body">
           <List className={ `chats-list ${classes.root}` }>
             { chatsArray }
+            <div id={ scrolledId } />
           </List>
           
           <Divider variant="middle" />
@@ -140,6 +176,7 @@ class ChatsList extends Component {
               color="secondary"
               variant = "filled"
               placeholder="Добавить чат ..."
+              autoComplete="off"
               onChange = { this.handleChange }
               onKeyUp = { this.handleKeyUp }
               value = { this.state.input || '' }
@@ -154,11 +191,12 @@ class ChatsList extends Component {
 
 
 const mapStateToProps = ({ chatsReducer }) => ({
+  chatId: chatsReducer.chatId,
   chats: chatsReducer.chats
 });
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ addChat }, dispatch);
+  bindActionCreators({ changeChat, loadChats, addChat, push }, dispatch);
 
 export default
   connect(mapStateToProps, mapDispatchToProps)

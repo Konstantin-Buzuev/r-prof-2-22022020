@@ -1,4 +1,6 @@
-import { SEND_MSG } from "../store/actions/messages_actions" ;
+import { SUCCESS_MESSAGE_SEND, sendMessage } from "../store/actions/messages_actions" ;
+import chatReducer from '../store/reducers/chats_reducer';
+import { Types } from 'mongoose';
 
 import botData from './botData.json';
 const randomBotData = () => Math.floor(Math.random() * botData.emoji.length);
@@ -6,25 +8,20 @@ const randomBotEmoj = () => String.fromCodePoint(botData.emoji[randomBotData()])
 const randomBotMsg = () => botData.msg[randomBotData()];
 
 export default store => next => action => {
-  let chat = store.getState().chatsReducer.chats[action.chatId];
-  console.log(store.getState())
-  const botPrefix = `${chat.bot} :: `;
-  //console.log(action.type, action.sender, action.text)
   switch (action.type) {
-    case SEND_MSG:
-      if(action.sender === chat.user) {
-        //console.log ('Надо бы ответить')
+    case SUCCESS_MESSAGE_SEND:
+      const chat = store.getState().chatsReducer.chats[action.payload.chat];
+      if(action.payload.sender !== chat.bot) {
         setTimeout(() => {
-            //this.setState ({
-                // chat.msg = [...chat.msgArray, 
-                  // {
-                    // msgId: chat.msgArray.length + 2,
-                    // sender: `${botPrefix}${randomBotEmoj()}`,
-                    // text: randomBotMsg() 
-                  // }
-                // ];
-            //});
-        }, 500)
+          store.dispatch (
+            sendMessage(
+              new (Types.ObjectId),
+              action.payload.chat,
+              chat.bot,
+              `${randomBotEmoj()} ${randomBotMsg()}`
+            )
+          )
+        }, 500);
       };
   };
   return next(action);

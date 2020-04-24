@@ -1,28 +1,63 @@
 import update from 'react-addons-update'
-//import ACTIONS
-import { ADD_CHAT, DEL_CHAT } from '../actions/chats_action.js'
+
+import { SUCCESS_MESSAGES_LOADING,
+         SUCCESS_MESSAGE_SENDING } from '../actions/messages_action.js'
+import { SUCCESS_CHATS_LOADING, 
+         SUCCESS_CHAT_CREATING, 
+         SUCCESS_CHAT_DELETING } from '../actions/chats_action.js'
 
 const initialStore = {
-   chatRooms: {
-      1: { title: "HelpDesk" },
-      2: { title: "Darth Vader" },
-      3: { title: "Typical JS" },
-   }
+   chatRooms: {},
+   isLoading: true,
 }
 
 export default function chatReducer (store = initialStore, action) {
    switch (action.type) {
-      case ADD_CHAT: {
+      
+      // Load data cases
+      case SUCCESS_CHATS_LOADING: {
+         const chatRooms = {}
+         action.payload.forEach(chat => {
+            const { _id, title, messageList } = chat
+            chatRooms[_id] = { title, messageList }
+         })
+         return update(store, {
+            chatRooms: { $set: chatRooms },
+         })
+      }
+      case SUCCESS_MESSAGES_LOADING: {
+         const chatRooms = {...store.chatRooms}
+         action.payload.forEach(msg => {
+            chatRooms[msg.chatId].messageList.push(msg)
+         })
+         return update(store, {
+            chatRooms: { $set: chatRooms },
+            isLoading: { $set: false }
+         })
+      }
+
+      // Change data cases
+      case SUCCESS_CHAT_CREATING: {
+         const { _id, title, messageList } = action.payload
          return update(store, {
             chatRooms: {
-               $merge: { [action.chatId]: { title: action.title } }
+               $merge: { [_id]: { title, messageList } }
             }
          })
       }
-      case DEL_CHAT: {
+      case SUCCESS_CHAT_DELETING: {
+         const chatRooms = {...store.chatRooms}
+         delete chatRooms[action.payload._id]
+         return update(store, {
+            chatRooms: { $set: chatRooms }
+         })
+      }
+      case SUCCESS_MESSAGE_SENDING: {
+         const { chatId } = action.payload
          return update(store, {
             chatRooms: {
-               [action.chatId]: { $set: undefined }
+               $merge: { [chatId]: { title: store.chatRooms[chatId].title, 
+                  messageList: [...store.chatRooms[chatId].messageList, action.payload] } }
             }
          })
       }

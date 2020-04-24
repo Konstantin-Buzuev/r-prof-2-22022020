@@ -15,10 +15,10 @@ export default class Router extends Component {
         />
         <Route
           exact 
-          path='/chat/:chatId/' 
+          path='/chat/:id/' 
           render={ obj => 
             <Layout
-              chatId={ Number(obj.match.params.chatId) } 
+              chatId={ obj.match.params.id } 
             />
           }
         />

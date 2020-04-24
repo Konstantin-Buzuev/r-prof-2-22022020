@@ -8,7 +8,6 @@ import { Box,
          IconButton,
          Menu, MenuItem } from '@material-ui/core'
 import MoreIcon from '@material-ui/icons/MoreHoriz'
-import NotificationsOffIcon from '@material-ui/icons/NotificationsOff'
 import DeleteIcon from '@material-ui/icons/Delete'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 
@@ -33,20 +32,16 @@ const useStyles = makeStyles(theme => ({
    }
 }))
 
-const StyledMenu = withStyles({
-   paper: {
-     border: '1px solid #2C2C6A',
-   },
- })(props => (
+const StyledMenu = withStyles({})(props => (
    <Menu
      elevation={5}
      getContentAnchorEl={null}
      anchorOrigin={{
-       vertical: 'top',
+       vertical: 'center',
        horizontal: 'right',
      }}
      transformOrigin={{
-       vertical: 'top',
+       vertical: 'center',
        horizontal: 'right',
      }}
      {...props}
@@ -55,16 +50,20 @@ const StyledMenu = withStyles({
  
  const StyledMenuItem = withStyles(theme => ({
    root: {
-     '&:hover': {
-       backgroundColor: theme.palette.primary.light
-     },
+      '&:hover': {
+         background: 'none',
+         color: theme.palette.secondary.light,
+         '& > .MuiListItemIcon-root': {
+            color: theme.palette.secondary.light,
+         }
+      }
    },
  }))(MenuItem)
 
 let chat = (props) => {
 
    const classes = useStyles()
-   const { handleNavigate, chatRoomId, title, message, isSelected, deleteChat } = props
+   const { handleNavigate, chatRoomId, title, lastMessage, isSelected, deleteChat } = props
 
    const [ anchorEl, setAnchorEl ] = React.useState(null)
 
@@ -84,7 +83,7 @@ let chat = (props) => {
             <ListItemAvatar>
                <Avatar className={ classes.avatar }> { title[0].toUpperCase() } </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={ title } secondary={ message } />
+            <ListItemText primary={ title } secondary={ lastMessage } />
 
             {/* Chat's actions */}
             { isSelected && 
@@ -96,12 +95,7 @@ let chat = (props) => {
                anchorEl={ anchorEl }
                open={ Boolean(anchorEl) }
                onClose={ handleClose } >
-               <StyledMenuItem>
-                  <ListItemIcon>
-                     <NotificationsOffIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Mute" />
-               </StyledMenuItem>
+               
                <StyledMenuItem onClick={ () => deleteChat(chatRoomId) }>
                   <ListItemIcon>
                      <DeleteIcon fontSize="small" />

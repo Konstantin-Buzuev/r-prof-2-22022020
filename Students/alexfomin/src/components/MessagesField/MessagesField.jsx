@@ -5,8 +5,9 @@ import './style.css';
 
 import Message from '../Message/Message.jsx'
 import ChatList from '../ChatList/ChatList.jsx'
+import PropTypes from 'prop-types'
 
-import { sendMessage, sendAnswer } from '../../store/actions/messages_actions.js'
+import { sendMessage, loadMessages } from '../../store/actions/messages_actions.js'
 
 //redux
 import { bindActionCreators } from 'redux'
@@ -14,49 +15,14 @@ import connect from 'react-redux/es/connect/connect'
 
 
 class Messages extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            msg: '',
-        //     msgArray: [{
-        //         user: 'Darth Vader',
-        //         text: 'Hallo'
-        //     },
-        //     {
-        //         user: null,
-        //         text: null
-        //     },
-        //     {
-        //         user: 'Darth Vader',
-        //         text: 'I am your father'
-        //     },
-        //     {
-        //         user: null,
-        //         text: 'NOOOOOOOOO'
-        //     },
-        //     {
-        //         user: 'Darth Vader',
-        //         text: 'Hallo'
-        //     },
-        //     {
-        //         user: null,
-        //         text: null
-        //     },
-        //     {
-        //         user: 'Darth Vader',
-        //         text: 'I am your father'
-        //     },
-        //     {
-        //         user: null,
-        //         text: 'NOOOOOOOOO'
-        //     },
-        //     {
-        //         user: 'Darth Vader',
-        //         text: 'Hallo'
-        //     }
-        // ]
-        }
+    static propTypes = {
+        messages: PropTypes.array.isRequired,
+        //isLoading: PropTypes.bool.isRequired
     }
+
+        state = {
+            msg: ''
+        }
 
 
     //methods
@@ -64,10 +30,6 @@ class Messages extends Component {
         const { messages } = this.props
         const messageId = Object.keys(messages).length + 1;
         this.props.sendMessage(messageId, sender, text, chatId)
-        // this.setState ({
-        //     msgArray: [...this.state.msgArray, { user: this.props.usr, text: this.state.msg }], //ЯМы Дартвейдер
-        //     msg: ''
-        // })
     }
 
     handleChange = (evt) => {
@@ -80,22 +42,13 @@ class Messages extends Component {
         if (sender == 'Darth Vader') {
             this.sendMessage(message, sender, chatId)
         }
+        this.setState({msg: ''})
     }
 
 
-    //hooks
-    componentDidUpdate (prevState) {
-        let { messages } = this.props
-        let msgLength = Object.keys(messages).length
-        console.log(messages)
-        let prevMsgLength = Object.keys(prevState.messages).length
-        if (prevMsgLength < msgLength &&
-            messages[msgLength].user === 'Darth Vader') {
-            setTimeout(() => {
-                const messageId = msgLength + 1;
-                this.props.sendAnswer(messageId, 'Luke', "I'm not your son, just bot", this.props.chatId)
-            }, 500)
-        }
+    componentDidMount () {
+        console.log('Итерация ')
+        this.props.loadMessages()
     }
 
     
@@ -107,7 +60,7 @@ class Messages extends Component {
         Object.keys(messages).forEach(key => {
             if (messages[key].chatId === this.props.chatId) {
             MessagesArr.push(<Message 
-                sender={ messages[key].user } 
+                sender={ messages[key].sender } 
                 text={ messages[key].text }
                 key={ key }
             />)
@@ -124,7 +77,7 @@ class Messages extends Component {
           <Col sm="0" md="2" lg="3"></Col>
           <Col sm="12"  md="10" lg="6">       
             <InputGroup>
-                <Input onChange = {this.handleChange} value={this.state.msg}/>
+                <Input placeholder="текст сообщения" onChange = {this.handleChange} value={this.state.msg}/>
                 <InputGroupAddon addonType="append" >
                 <Button color="warning" onClick = { () => this.handleSendMessage (this.state.msg, 'Darth Vader', this.props.chatId) }>Отправить</Button>
                 </InputGroupAddon>
@@ -133,11 +86,7 @@ class Messages extends Component {
         </Row>
         </>
 
-                //   <input type="text" 
-                // onChange = { this.handleChange } 
-                // onKeyUp = { this.handleChange }
-                // value = { this.state.msg }/>
-                // <button onClick = { this.sendMessage }>Send</button> <p>Hello { usr }!</p>
+
         );
     }
 }
@@ -146,6 +95,6 @@ const mapStateToProps = ({ msgReducer }) => ({
     messages: msgReducer.messages
 })
 
-const mapDispatchToProps = dispatch => bindActionCreators( { sendMessage, sendAnswer }, dispatch )
+const mapDispatchToProps = dispatch => bindActionCreators( { sendMessage, loadMessages }, dispatch )
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messages)

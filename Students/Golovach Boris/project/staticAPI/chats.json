@@ -1,0 +1,57 @@
+[
+    {
+        "id": 1,
+        "title": "Darth",
+        "messageList": [
+            {
+                "id": 1,
+                "user": "Darth Vader",
+                "text": "Hallo",
+                "chatId": 1
+            },
+            {
+                "id": 2,
+                "user": null,
+                "text": null,
+                "chatId": 1
+            },
+            {
+                "id": 3,
+                "user": "Darth Vader",
+                "text": "I am your father",
+                "chatId": 1
+            },
+            {
+                "id": 4,
+                "user": null,
+                "text": "NOOOOOOOOO",
+                "chatId": 1
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "title": "Trips",
+        "messageList": [
+            {
+                "id": 5,
+                "user": "Bot",
+                "text": "Вы в чате №2",
+                "chatId": 2
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "title": "Business",
+        "messageList": [
+            {
+                "id": 6,
+                "user": "Bot",
+                "text": "Вы в чате №3",
+                "chatId": 3
+            }
+        ]
+    }
+ ]
+ 

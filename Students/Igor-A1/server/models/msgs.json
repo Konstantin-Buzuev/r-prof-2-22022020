@@ -1,0 +1,56 @@
+[
+  {
+    "chat": "5e736fcf7d35460190d8b1d4",
+    "sender": "Darth Vader",
+    "text": "Hallo",
+    "_id": "5e736fcf7d35460190d8b1d5"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1d4",
+    "sender": "Luke",
+    "text": "Who are you?",
+    "_id": "5e736fcf7d35460190d8b1d6"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1d4",
+    "sender": "Darth Vader",
+    "text": "I am your father",
+    "_id": "5e736fcf7d35460190d8b1d7"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1d4",
+    "sender": "Luke",
+    "text": "NOOOOOOOOO!",
+    "_id": "5e736fcf7d35460190d8b1d8"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1d9",
+    "sender": "Geek",
+    "text": "Превед!",
+    "_id": "5e736fcf7d35460190d8b1da"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1d9",
+    "sender": "bot",
+    "text": "goto null",
+    "_id": "5e736fcf7d35460190d8b1db"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1d9",
+    "sender": "Geek",
+    "text": "Чё ты гонишь?",
+    "_id": "5e736fcf7d35460190d8b1dc"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1dd",
+    "sender": "Администратор",
+    "text": "Всем выйти из чата!",
+    "_id": "5e736fcf7d35460190d8b1de"
+  },
+  {
+    "chat": "5e736fcf7d35460190d8b1dd",
+    "sender": "SysAdmin",
+    "text": "Расслабьтесь, это была шутка юмора.",
+    "_id": "5e736fcf7d35460190d8b1df"
+  }
+]

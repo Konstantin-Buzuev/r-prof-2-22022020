@@ -5,7 +5,8 @@ import { Button, Form, Row, } from 'react-bootstrap';
 
 import Message from '../Message/Message.jsx';
 
-import { sendMessage } from '../../store/actions/messages_actions.js';
+import { sendMessage, addMessage } from '../../store/actions/messages_actions.js';
+// import { addMessage } from '../../store/actions/add_messages_action';
 
 import { bindActionCreators } from 'redux';
 import connect from 'react-redux/es/connect/connect';
@@ -19,14 +20,34 @@ class Messages extends Component {
        }
 
     addNewMessage = (text, sender) => {
-        const { messages } = this.props;
+        // const { messages } = this.props;
         const { chatId } = this.props;
-        const messageId = Object.keys(messages).length + 1;
+        // const messageId = Object.keys(messages).length + 1;
 
-        this.props.sendMessage(messageId, sender, text, chatId);
         this.setState({
             newMessage: ''
         });
+
+        const newMessage = {
+            sender,
+            text,
+            chatId,
+        };
+
+        fetch("/api/message", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newMessage)
+          })
+            .then(response => response.json())
+            .then(data => {
+              this.props.sendMessage(data._id, sender, text, chatId);
+            })
+            .catch(err => {
+              console.log(err);
+            });
     }
 
     handleChange = (event) => {
@@ -40,6 +61,13 @@ class Messages extends Component {
     componentDidMount() {
         const block = this.refs["msgBlock"];
         block.scrollTop = block.scrollHeight;
+
+        fetch('/api/messages')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                data.forEach( msg => this.props.addMessage( msg._id, msg.sender, msg.text, msg.chatId ) );
+            });
     }
 
     componentDidUpdate () {
@@ -100,6 +128,6 @@ const mapStateToProps = ({ msgReducer, userReducer }) => ({
     usr: userReducer.user,
 });
 
-const mapDispatchToProps = dispatch => bindActionCreators( { sendMessage }, dispatch );
+const mapDispatchToProps = dispatch => bindActionCreators( { sendMessage, addMessage }, dispatch );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messages);

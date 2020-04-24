@@ -40,11 +40,11 @@ export default function Message(props) {
     if(bot) {
       return (
         <Box
-          className={`msg-item ${classes.robot}`}
+          className={`msg-item blink1s ${classes.robot}`}
           border={ 1 }
         >
           <strong>{ sender }</strong>
-          <p><em>{ text }</em></p>
+          <p>{ text || 'Болтун подобен маятнику: того и другого надо остановить.' }</p>
         </Box>
       );
     } else {

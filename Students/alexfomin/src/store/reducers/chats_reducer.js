@@ -1,6 +1,6 @@
 import update from 'react-addons-update'
 //import ACTIONS
-import { ADD_CHAT } from '../actions/chats_actions.js'
+import { ADD_CHAT, DEL_CHAT } from '../actions/chats_actions.js'
 
 let initialStore = {
     chats: {
@@ -33,7 +33,12 @@ export default function chatsReducer(store = initialStore, action) {
                         } 
                     } 
                 }
-            });
+            })
+        }
+        case DEL_CHAT: {
+            let newStore = JSON.parse(JSON.stringify(store));
+            delete newStore.chats[action.chatId];
+            return newStore;
         }
         default: {
             return store
